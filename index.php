@@ -1,7 +1,7 @@
 <?php
 
 
-header("Access-Control-Allow-Origin: https://ephemeral-souffle-6b7fdc.netlify.app");
+header("Access-Control-Allow-Origin: https://focusdeskk.netlify.app.");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
