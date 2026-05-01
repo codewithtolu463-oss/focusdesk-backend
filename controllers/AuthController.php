@@ -12,17 +12,21 @@ function register(){
         echo json_encode(['message' => 'All fields are required']);
         return;
     }
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->execute([':email' => $data->email]);
-    if($stmt->rowCount() > 0){
+   $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+$stmt->bind_param("s", $data->email);
+$stmt->execute();
+$result = $stmt->get_result();
+    if($result-> num_rows > 0){
         http_response_code(409);
         echo json_encode(['message' => 'Email already exists']);
         return;
     }
+    
     $hashedPassword = password_hash($data->password, PASSWORD_BCRYPT);
-    $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (:name, :email, :password)");
-    $stmt->execute([':name' => $data->name, ':email' => $data->email, ':password' => $hashedPassword]);
-    if($stmt->rowCount() > 0){
+   $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+$stmt->bind_param("sss", $data->name, $data->email, $hashedPassword);
+$stmt->execute();
+    if($stmt->affected_rows> 0){
         http_response_code(201);
         echo json_encode(['message' => 'User registered']);
     } else {
@@ -39,9 +43,11 @@ function login(){
         echo json_encode(['message' => 'All fields are required']);
         return;
     }
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-    $stmt->execute([':email' => $data->email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
+$stmt->bind_param("s", $data->email);
+$stmt->execute();
+$result = $stmt->get_result();
+    $user = $result->fetch_assoc();
     if($user && password_verify($data->password, $user['password'])){
         http_response_code(200);
         $secretkey = "focusdesk_super_secret_key_2026_xyz";
