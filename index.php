@@ -11,6 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-
+if ($_SERVER['REQUEST_URI'] === '/test') {
+    echo json_encode(['message' => 'Server is working!']);
+    exit();
+}
 require_once 'routes/api.php';
 ?>
