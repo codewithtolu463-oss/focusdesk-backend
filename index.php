@@ -15,5 +15,10 @@ if ($_SERVER['REQUEST_URI'] === '/test') {
     echo json_encode(['message' => 'Server is working!']);
     exit();
 }
+if ($_SERVER['REQUEST_URI'] === '/dbtest') {
+    require_once 'config/db.php';
+    echo json_encode(['message' => 'DB connected!']);
+    exit();
+}
 require_once 'routes/api.php';
 ?>
