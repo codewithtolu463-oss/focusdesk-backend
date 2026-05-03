@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_URI'] === '/dbtest') {
     exit();
 }
 echo json_encode(['message' => 'before api']);
+error_log($_SERVER['REQUEST_URI']);
 require_once 'routes/api.php';
 echo json_encode(['message' => 'after api']);
 ?>
