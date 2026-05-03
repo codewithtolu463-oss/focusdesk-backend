@@ -1,13 +1,11 @@
 <?php
-$host = getenv('mysql.railway.internal');
-$username = getenv('root');
-$password = getenv('fcoOgbHYRYOjdOjlnPkPjULLIwVAUsYu');
-$database_name = getenv('railway');
-$port = getenv('3306');
-try {
-    $conn = new PDO("mysql:host=$host;port=$port;dbname=$database_name", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    die(json_encode(['message' => 'Connection failed: ' . $e->getMessage()]));
+$host = getenv('MYSQLHOST');
+$username = getenv('MYSQLUSER');
+$password = getenv('MYSQLPASSWORD');
+$database_name = getenv('MYSQLDATABASE');
+$port = getenv('MYSQLPORT');
+$conn = new mysqli($host, $username, $password, $database_name, $port);
+if($conn->connect_error){
+    die(json_encode(['message' => 'Connection failed: ' . $conn->connect_error]));
 }
 ?>
