@@ -1,27 +1,12 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 header("Access-Control-Allow-Origin: https://focusdeskk.netlify.app");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json");
- 
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
-if ($_SERVER['REQUEST_URI'] === '/test') {
-    echo json_encode(['message' => 'Server is working!']);
-    exit();
-}
-if ($_SERVER['REQUEST_URI'] === '/dbtest') {
-    require_once 'config/db.php';
-    echo json_encode(['message' => 'DB connected!']);
-    exit();
-}
-echo json_encode(['message' => 'before api']);
-error_log($_SERVER['REQUEST_URI']);
+
 require_once 'routes/api.php';
-echo json_encode(['message' => 'after api']);
-?>
