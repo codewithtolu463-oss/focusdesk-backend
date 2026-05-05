@@ -23,7 +23,7 @@ $result = $stmt->get_result();
     }
     
     $hashedPassword = password_hash($data->password, PASSWORD_BCRYPT);
-   $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
+   $stmt = $conn->prepare("INSERT INTO users (name, email, password, created_at) VALUES (?, ?, ?, NOW())");
 $stmt->bind_param("sss", $data->name, $data->email, $hashedPassword);
 $stmt->execute();
     if($stmt->affected_rows> 0){
