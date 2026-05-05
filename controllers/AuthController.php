@@ -51,12 +51,12 @@ $result = $stmt->get_result();
 if($user && password_verify($data->password, $user['Password'])){  
         http_response_code(200);
         $secretkey = "focusdesk_super_secret_key_2026_xyz";
-        $payload = [
-            'user_id' => $user['id'],
-            'email' => $user['email'],
-            'name' => $user['name'],
-            'exp' => time() + 3600
-        ];
+       $payload = [
+    'user_id' => $user['ID'],
+    'email' => $user['Email'],
+    'name' => $user['Name'],
+    'exp' => time() + 3600
+];
         $token = JWT::encode($payload, $secretkey, 'HS256');
         echo json_encode(['message' => 'User logged in', 'token' => $token]);
     } else {
