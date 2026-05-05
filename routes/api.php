@@ -60,3 +60,10 @@ if ($requestUri === '/register' && $requestMethod === 'POST') {
     http_response_code(404);
     echo json_encode(['message' => 'Route not found']);
 }
+?>
+
+
+
+
+
+
