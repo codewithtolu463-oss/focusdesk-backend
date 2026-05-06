@@ -14,7 +14,7 @@ if(empty($header)){
 $token = str_replace('Bearer ', '', $header);
 
 try{
-    $secretkey = "your_secret_key_here";
+    $secretkey = "focusdesk_super_secret_key_2026_xyz";
     $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
     return $decoded;
 } catch(Exception $e){
