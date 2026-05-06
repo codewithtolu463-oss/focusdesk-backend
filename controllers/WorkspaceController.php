@@ -1,14 +1,13 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../vendor/autoload.php';
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 function createworkspace(){
     global $conn;
     $data = json_decode(file_get_contents("php://input"));
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     $token = str_replace('Bearer ', '', $header);
     try {
@@ -17,12 +16,14 @@ function createworkspace(){
         $user_id = $decoded->user_id;
         $workspace_name = $data->workspace_name;
         $stmt = $conn->prepare("INSERT INTO workspace (Workspace_Name, Created_by) VALUES (?, ?)");
-        $stmt->execute([$workspace_name, $user_id]);
-        if($stmt->rowCount() > 0){
-            $workspace_id = $conn->lastInsertId();
+        $stmt->bind_param("si", $workspace_name, $user_id);
+        $stmt->execute();
+        if($stmt->affected_rows > 0){
+            $workspace_id = $conn->insert_id;
             $role = 'owner';
             $stmt2 = $conn->prepare("INSERT INTO workspace_members (`Workspace ID`, `User ID`, Role) VALUES (?, ?, ?)");
-            $stmt2->execute([$workspace_id, $user_id, $role]);
+            $stmt2->bind_param("iis", $workspace_id, $user_id, $role);
+            $stmt2->execute();
             http_response_code(201);
             echo json_encode(['message' => 'Workspace created']);
         } else {
@@ -37,7 +38,7 @@ function createworkspace(){
 
 function getuserworkspaces(){
     global $conn;
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     try {
         $token = str_replace('Bearer ', '', $header);
@@ -45,8 +46,10 @@ function getuserworkspaces(){
         $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
         $user_id = $decoded->user_id;
         $stmt = $conn->prepare("SELECT w.ID, w.Workspace_Name FROM workspace w JOIN workspace_members wm ON w.ID = wm.`Workspace ID` WHERE wm.`User ID` = ?");
-        $stmt->execute([$user_id]);
-        $workspaces = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $workspaces = $result->fetch_all(MYSQLI_ASSOC);
         http_response_code(200);
         echo json_encode($workspaces);
     } catch(Exception $e){
@@ -58,7 +61,7 @@ function getuserworkspaces(){
 function invitemember(){
     global $conn;
     $data = json_decode(file_get_contents("php://input"));
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     try {
         $token = str_replace('Bearer ', '', $header);
@@ -68,7 +71,8 @@ function invitemember(){
         $workspace_id = $data->workspace_id;
         $role = 'member';
         $stmt = $conn->prepare("INSERT INTO workspace_members (`Workspace ID`, `User ID`, Role) VALUES (?, ?, ?)");
-        $stmt->execute([$workspace_id, $user_id, $role]);
+        $stmt->bind_param("iis", $workspace_id, $user_id, $role);
+        $stmt->execute();
         http_response_code(201);
         echo json_encode(['message' => 'User added to workspace']);
     } catch(Exception $e){
