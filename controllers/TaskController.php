@@ -26,8 +26,9 @@ function createTask(){
     $status = $data->status;
     $position = $data->position;
     $stmt = $conn->prepare("INSERT INTO tasks (workspace_id, title, description, status, position, created_by) VALUES(?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$workspace_id, $title, $description, $status, $position, $user_id]);
-    if($stmt->rowCount() > 0){
+   $stmt->bind_param("issssi", $workspace_id, $title, $description, $status, $position, $user_id);
+$stmt->execute();
+if($stmt->affected_rows > 0){
         http_response_code(201);
         echo json_encode(['message' => 'Task Created']);
     } else {
@@ -52,8 +53,9 @@ function getTask(){
     parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
     $workspace_id = $params['workspace_id'] ?? null;
     $stmt = $conn->prepare("SELECT * FROM tasks WHERE workspace_id = ?");
-    $stmt->execute([$workspace_id]);
-    $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt->bind_param("i", $workspace_id);
+$stmt->execute();
+$tasks = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     http_response_code(200);
     echo json_encode($tasks);
 }
@@ -76,7 +78,8 @@ function updateTask(){
     $status = $data->status;
     $position = $data->position;
     $stmt = $conn->prepare("UPDATE tasks SET status = ?, position = ? WHERE ID = ?");
-    $stmt->execute([$status, $position, $task_id]);
+    $stmt->bind_param("sii", $status, $position, $task_id);
+$stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Task Updated']);
 }
@@ -97,7 +100,8 @@ function deleteTask(){
     }
     $task_id = $data->task_id;
     $stmt = $conn->prepare("DELETE FROM tasks WHERE ID = ?");
-    $stmt->execute([$task_id]);
+   $stmt->bind_param("i", $task_id);
+$stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Task Deleted']);
 }
