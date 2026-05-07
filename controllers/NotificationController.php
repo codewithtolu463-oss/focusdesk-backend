@@ -12,9 +12,10 @@ function getnotifcation(){
     $secretkey = "focusdesk_super_secret_key_2026_xyz";
     $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
     $user_id = $decoded->user_id;
-    $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = :user_id AND is_read = 0");
-    $stmt->execute([':user_id' => $user_id]);
-    $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0");
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$notifications = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     http_response_code(200);
     echo json_encode($notifications);
 }
@@ -28,8 +29,9 @@ function markread(){
     $secretkey = "focusdesk_super_secret_key_2026_xyz";
     $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
     $notification_id = $data->notification_id;
-    $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE ID = :notification_id");
-    $stmt->execute([':notification_id' => $notification_id]);
+   $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE ID = ?");
+$stmt->bind_param("i", $notification_id);
+$stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Notification marked as read']);
 }
