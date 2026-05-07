@@ -29,10 +29,7 @@ $secretkey = "focusdesk_super_secret_key_2026_xyz";
 $stmt = $conn->prepare($insertquery);
 $stmt->bind_param("ii",  $task_id, $user_id);
 $stmt->execute(); 
-error_log("task_id: " . $task_id);
-error_log("user_id: " . $user_id);
-error_log("affected: " . $stmt->affected_rows);
-error_log("stmt error: " . $stmt->error);
+
 if($stmt->affected_rows > 0){
         http_response_code(201);
        echo json_encode(['message'=> 'Time started', 'log_id' => $conn->insert_id]);
