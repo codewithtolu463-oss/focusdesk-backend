@@ -26,21 +26,21 @@ function sendMessage(){
     $user_id = $decoded->user_id;
     $message = $data->newmessage;
     $workspace_id = $data->workspace_id;
-    $stmt = $conn->prepare("INSERT INTO Messages (sent_by, message, workspace_id) VALUES (:user_id, :message, :workspace_id)");
-    $stmt->execute([':user_id' => $user_id, ':message' => $message, ':workspace_id' => $workspace_id]);
-    if($stmt->rowCount() > 0){ http_response_code(201); 
-    echo json_encode(['message' => 'Message sent']); 
-       return;
-    }
-        
-    $mstmt = $conn->prepare("SELECT `User ID` FROM workspace_members WHERE `Workspace ID` = :workspace_id AND `User ID` != :user_id");
-    $mstmt->execute([':workspace_id' => $workspace_id, ':user_id' => $user_id]);
-    $members = $mstmt->fetchAll(PDO::FETCH_ASSOC);
+
+ $stmt = $conn->prepare("INSERT INTO Messages (sent_by, message, workspace_id) VALUES (?, ?, ?)");
+$stmt->bind_param("isi", $user_id, $message, $workspace_id);
+$stmt->execute();
+if($stmt->affected_rows > 0){
+    $mstmt = $conn->prepare("SELECT `User ID` FROM workspace_members WHERE `Workspace ID` = ? AND `User ID` != ?");
+$mstmt->bind_param("ii", $workspace_id, $user_id);
+$mstmt->execute();
+$members = $mstmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $notifmessage = "New message in your workspace";
     foreach($members as $row){
         $member_id = $row['User ID'];
-        $nstmt = $conn->prepare("INSERT INTO notifications (user_id, message, is_read) VALUES (:member_id, :message, 0)");
-        $nstmt->execute([':member_id' => $member_id, ':message' => $notifmessage]);
+        $nstmt = $conn->prepare("INSERT INTO notifications (user_id, message, is_read) VALUES (?, ?, 0)");
+$nstmt->bind_param("is", $member_id, $notifmessage);
+$nstmt->execute();
     }
 }
 
@@ -60,9 +60,10 @@ function getMessage(){
     }
     parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
     $workspace_id = $params['workspace_id'] ?? null;
-    $stmt = $conn->prepare("SELECT Messages.*, Users.name AS sender_name FROM Messages JOIN Users ON Messages.sent_by = Users.id WHERE Messages.workspace_id = :workspace_id");
-    $stmt->execute([':workspace_id' => $workspace_id]);
-    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+   $stmt = $conn->prepare("SELECT Messages.*, Users.name AS sender_name FROM Messages JOIN Users ON Messages.sent_by = Users.id WHERE Messages.workspace_id = ?");
+$stmt->bind_param("i", $workspace_id);
+$stmt->execute();
+$messages = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     http_response_code(200);
     echo json_encode($messages);
 }
@@ -82,8 +83,9 @@ function deleteMessage(){
     return;
 }
     $message_id = $data->message_id;
-    $stmt = $conn->prepare("DELETE FROM Messages WHERE ID = :message_id");
-    $stmt->execute([':message_id' => $message_id]);
+  $stmt = $conn->prepare("DELETE FROM Messages WHERE ID = ?");
+$stmt->bind_param("i", $message_id);
+$stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Message deleted']);
 }
