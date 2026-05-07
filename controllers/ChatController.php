@@ -42,6 +42,8 @@ $members = $mstmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $nstmt->bind_param("is", $member_id, $notifmessage);
 $nstmt->execute();
     }
+    http_response_code(201);
+    echo json_encode(['message'=>'Message sent'])
 }
 
 function getMessage(){
