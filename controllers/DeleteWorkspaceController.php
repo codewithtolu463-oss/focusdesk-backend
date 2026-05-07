@@ -13,8 +13,9 @@ function deleteWorkspace(){
     $secretkey = "focusdesk_super_secret_key_2026_xyz";
     $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
     $workspace_id = $data->workspace_id;
-    $stmt = $conn->prepare("DELETE FROM workspace WHERE ID = :workspace_id");
-    $stmt->execute([':workspace_id' => $workspace_id]);
+$stmt = $conn->prepare("DELETE FROM workspace WHERE ID = ?");
+$stmt->bind_param("i", $workspace_id);
+$stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Workspace deleted']);
 }
