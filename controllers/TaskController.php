@@ -31,10 +31,11 @@ $stmt->execute();
 if($stmt->affected_rows > 0){
         http_response_code(201);
         echo json_encode(['message' => 'Task Created']);
-    } else {
-        http_response_code(500);
-        echo json_encode(['message' => 'Something went wrong']);
-    }
+   } else {
+    error_log("TASK ERROR: " . $conn->error);
+    http_response_code(500);
+    echo json_encode(['message' => $conn->error]);
+}
 }
 
 function getTask(){
