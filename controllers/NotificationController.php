@@ -10,7 +10,13 @@ function getnotifcation(){
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     $token = str_replace('Bearer ', '', $header);
     $secretkey = "focusdesk_super_secret_key_2026_xyz";
-    $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
+   try{
+       $decoded = JWT:: decode($token, new Key($secretkey, 'HS256'));
+   } catch(Exception $e) {
+       http_response_code(401);
+       echo json_encode(['message'=> 'Invalid or expired token']);
+       return;
+   }
     $user_id = $decoded->user_id;
     $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0");
 $stmt->bind_param("i", $user_id);
@@ -27,7 +33,13 @@ function markread(){
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     $token = str_replace('Bearer ', '', $header);
     $secretkey = "focusdesk_super_secret_key_2026_xyz";
-    $decoded = JWT::decode($token, new Key($secretkey, 'HS256'));
+    try{
+       $decoded = JWT:: decode($token, new Key($secretkey, 'HS256'));
+   } catch(Exception $e) {
+       http_response_code(401);
+       echo json_encode(['message'=> 'Invalid or expired token']);
+       return;
+   }
     $notification_id = $data->notification_id;
    $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE ID = ?");
 $stmt->bind_param("i", $notification_id);
