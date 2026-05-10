@@ -7,7 +7,7 @@ use Firebase\JWT\Key;
 function createworkspace(){
     global $conn;
     $data = json_decode(file_get_contents("php://input"));
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     $token = str_replace('Bearer ', '', $header);
     try {
@@ -38,7 +38,7 @@ function createworkspace(){
 
 function getuserworkspaces(){
     global $conn;
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     try {
         $token = str_replace('Bearer ', '', $header);
@@ -59,9 +59,10 @@ function getuserworkspaces(){
 }
 
 function invitemember(){
+    
     global $conn;
     $data = json_decode(file_get_contents("php://input"));
-    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     try {
         $token = str_replace('Bearer ', '', $header);
