@@ -8,6 +8,8 @@ function createworkspace(){
     global $conn;
     $data = json_decode(file_get_contents("php://input"));
     $header = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? apache_request_headers()['Authorization'] ?? null;
+   error_log("HEADER: " . print_r($header, true));
+error_log("ALL: " . print_r(apache_request_headers(), true));
     if(empty($header)){ http_response_code(401); echo json_encode(['message' => 'No token provided']); return; }
     $token = str_replace('Bearer ', '', $header);
     try {
