@@ -33,9 +33,10 @@ error_log("ALL: " . print_r(apache_request_headers(), true));
             echo json_encode(['message' => 'Something went wrong']);
         }
     } catch(Exception $e){
-        http_response_code(401);
-        echo json_encode(['message' => 'Invalid or expired token']);
-    }
+    error_log("JWT ERROR: " . $e->getMessage());
+    http_response_code(401);
+    echo json_encode(['message' => $e->getMessage()]);
+}
 }
 
 function getuserworkspaces(){
