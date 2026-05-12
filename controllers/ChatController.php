@@ -27,7 +27,7 @@ function sendMessage(){
     $message = $data->newmessage;
     $workspace_id = $data->workspace_id;
 
- $stmt = $conn->prepare("INSERT INTO Messages (sent_by, message, workspace_id) VALUES (?, ?, ?)");
+ $stmt = $conn->prepare("INSERT INTO messages (sent_by, message, workspace_id) VALUES (?, ?, ?)");
 $stmt->bind_param("isi", $user_id, $message, $workspace_id);
 $stmt->execute();
 if($stmt->affected_rows > 0){
@@ -62,7 +62,7 @@ function getMessage(){
     }
     parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
     $workspace_id = $params['workspace_id'] ?? null;
-   $stmt = $conn->prepare("SELECT Messages.*, Users.name AS sender_name FROM Messages JOIN Users ON Messages.sent_by = Users.ID WHERE Messages.workspace_id = ?");
+   $stmt = $conn->prepare("SELECT messages.*, Users.name AS sender_name FROM Messages JOIN Users ON Messages.sent_by = Users.ID WHERE Messages.workspace_id = ?");
 $stmt->bind_param("i", $workspace_id);
 $stmt->execute();
 $messages = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
@@ -85,7 +85,7 @@ function deleteMessage(){
     return;
 }
     $message_id = $data->message_id;
-  $stmt = $conn->prepare("DELETE FROM Messages WHERE ID = ?");
+  $stmt = $conn->prepare("DELETE FROM messages WHERE ID = ?");
 $stmt->bind_param("i", $message_id);
 $stmt->execute();
     http_response_code(200);
