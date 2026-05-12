@@ -28,6 +28,7 @@ function createTask(){
     $stmt = $conn->prepare("INSERT INTO tasks (workspace_id, title, description, status, position, created_by) VALUES(?, ?, ?, ?, ?, ?)");
    $stmt->bind_param("issssi", $workspace_id, $title, $description, $status, $position, $user_id);
 $stmt->execute();
+    error_log("AFFECTED: " . $stmt->affected_rows . " ERROR: " . $conn->error);
 if($stmt->affected_rows > 0){
         http_response_code(201);
         echo json_encode(['message' => 'Task Created']);
