@@ -62,7 +62,7 @@ function getMessage(){
     }
     parse_str($_SERVER['QUERY_STRING'] ?? '', $params);
     $workspace_id = $params['workspace_id'] ?? null;
-   $stmt = $conn->prepare("SELECT messages.*, Users.name AS sender_name FROM Messages JOIN Users ON Messages.sent_by = Users.ID WHERE Messages.workspace_id = ?");
+$stmt = $conn->prepare("SELECT messages.*, users.name AS sender_name FROM messages JOIN users ON messages.sent_by = users.ID WHERE messages.workspace_id = ?");
 $stmt->bind_param("i", $workspace_id);
 $stmt->execute();
 $messages = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
