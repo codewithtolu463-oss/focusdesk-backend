@@ -56,6 +56,10 @@ if ($requestUri === '/register' && $requestMethod === 'POST') {
 } elseif ($requestUri === '/notification/read' && $requestMethod === 'PUT') {
     require_once __DIR__ . '/../controllers/NotificationController.php';
     markread();
+} 
+} elseif ($requestUri === '/task/check' && $requestMethod === 'GET') {
+    require_once __DIR__ . '/../controllers/TaskController.php';
+    checkduetasks();
 } else {
     http_response_code(404);
     echo json_encode(['message' => 'Route not found']);
