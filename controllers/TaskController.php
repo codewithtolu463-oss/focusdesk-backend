@@ -25,9 +25,10 @@ function createTask(){
     $description = $data->description;
     $status = $data->status;
     $position = $data->position;
-    $stmt = $conn->prepare("INSERT INTO tasks (workspace_id, title, description, status, position, created_by) VALUES(?, ?, ?, ?, ?, ?)");
+    $due_date = $data->due_date ?? null;
+    $stmt = $conn->prepare("INSERT INTO tasks (workspace_id, title, description, status, position, created_by, due_date) VALUES(?, ?, ?, ?, ?, ?, ?)");
   if(!$stmt){ error_log("PREPARE ERROR: " . $conn->error); http_response_code(500); echo json_encode(['message' => $conn->error]); return; }
-    $stmt->bind_param("issssi", $workspace_id, $title, $description, $status, $position, $user_id);
+    $stmt->bind_param("issssis", $workspace_id, $title, $description, $status, $position, $user_id, $due_date);
 $stmt->execute();
     error_log("AFFECTED: " . $stmt->affected_rows . " ERROR: " . $conn->error);
 if($stmt->affected_rows > 0){
