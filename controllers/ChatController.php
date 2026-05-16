@@ -84,9 +84,10 @@ function deleteMessage(){
     echo json_encode(['message' => 'Invalid or expired token']);
     return;
 }
+    $user_id = $decoded->user_id;
     $message_id = $data->message_id;
-  $stmt = $conn->prepare("DELETE FROM messages WHERE ID = ?");
-$stmt->bind_param("i", $message_id);
+$stmt = $conn->prepare("DELETE FROM messages WHERE ID = ? AND sent_by = ?");
+$stmt->bind_param("ii", $message_id, $user_id);
 $stmt->execute();
     http_response_code(200);
     echo json_encode(['message' => 'Message deleted']);
